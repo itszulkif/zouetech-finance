@@ -19,6 +19,62 @@ let kpiChart;
 const pkrFormatter = new Intl.NumberFormat("en-PK", { style: "currency", currency: "PKR", maximumFractionDigits: 2 });
 const formatPKR = (value) => pkrFormatter.format(Number(value || 0));
 const allowedRanges = new Set(["all", "daily", "weekly", "monthly", "yearly"]);
+const appSidebar = $("#appSidebar");
+const sidebarToggleBtn = $("#sidebarToggleBtn");
+const sidebarBackdrop = $("#sidebarBackdrop");
+
+function isMobileViewport() {
+  return typeof window !== "undefined" && window.matchMedia("(max-width: 1023px)").matches;
+}
+
+function setSidebarOpenState(isOpen) {
+  if (!appSidebar) return;
+  appSidebar.classList.toggle("hidden", !isOpen);
+  appSidebar.classList.toggle("block", isOpen);
+  if (sidebarBackdrop) {
+    sidebarBackdrop.classList.toggle("hidden", !isOpen);
+  }
+  if (sidebarToggleBtn) {
+    sidebarToggleBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    sidebarToggleBtn.setAttribute("aria-label", isOpen ? "Close menu" : "Open menu");
+  }
+}
+
+function closeSidebarOnMobile() {
+  if (!isMobileViewport()) return;
+  setSidebarOpenState(false);
+}
+
+function bindSidebarEvents() {
+  if (!appSidebar) return;
+
+  setSidebarOpenState(false);
+
+  sidebarToggleBtn?.addEventListener("click", () => {
+    const isOpen = appSidebar.classList.contains("hidden");
+    setSidebarOpenState(isOpen);
+  });
+
+  sidebarBackdrop?.addEventListener("click", () => {
+    setSidebarOpenState(false);
+  });
+
+  appSidebar.querySelectorAll("a").forEach((navLink) => {
+    navLink.addEventListener("click", closeSidebarOnMobile);
+  });
+
+  window.addEventListener("resize", () => {
+    if (!isMobileViewport()) {
+      setSidebarOpenState(false);
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeSidebarOnMobile();
+    }
+  });
+}
 
 function notify(msg, ok = true) {
   if (!toast) return;
@@ -226,13 +282,13 @@ async function loadTransactions() {
     }
     return `
     <tr class="border-b ${rowClass}">
-      <td class="py-2 pr-3">${t.recorded_at || "-"}</td>
+      <td class="py-2 pr-3 hidden md:table-cell">${t.recorded_at || "-"}</td>
       <td class="py-2 pr-3">${t.transaction_date || "-"}</td>
-      <td class="py-2 pr-3 capitalize">${t.tx_group}</td>
+      <td class="py-2 pr-3 capitalize hidden sm:table-cell">${t.tx_group}</td>
       <td class="py-2 pr-3 capitalize">${t.tx_type}</td>
       <td class="py-2 pr-3">${t.partner_name || "-"}</td>
-      <td class="py-2 pr-3">${t.description || "-"}</td>
-      <td class="py-2 pr-3">${t.impact_note || "-"}</td>
+      <td class="py-2 pr-3 hidden lg:table-cell">${t.description || "-"}</td>
+      <td class="py-2 pr-3 hidden lg:table-cell">${t.impact_note || "-"}</td>
       <td class="py-2 pr-3">${formatPKR(t.amount)}</td>
     </tr>
   `;
@@ -549,7 +605,7 @@ function renderPartnerBreakdown(rows) {
     <tr class="border-b">
       <td class="py-2 pr-3">${r.name}</td>
       <td class="py-2 pr-3">${formatPKR(r.share_received)}</td>
-      <td class="py-2 pr-3">${formatPKR(r.used_amount)}</td>
+      <td class="py-2 pr-3 hidden sm:table-cell">${formatPKR(r.used_amount)}</td>
       <td class="py-2 pr-3">${formatPKR(r.remaining_balance)}</td>
     </tr>
   `).join("") || `<tr><td class="py-2" colspan="4">No data</td></tr>`;
@@ -736,6 +792,7 @@ bindTransactionFilterEvents();
 bindExpenseHistoryEvents();
 bindIncomeDetailsEvents();
 bindReimbursementHistoryEvents();
+bindSidebarEvents();
 
 (async () => {
   try {

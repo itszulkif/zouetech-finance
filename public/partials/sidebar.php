@@ -10,7 +10,7 @@ $nav = [
     'reports' => ['label' => 'Reports', 'href' => '/zou-finance/public/reports.php'],
 ];
 ?>
-<aside class="w-full lg:w-64 bg-white border-r border-slate-200 min-h-screen">
+<aside id="appSidebar" class="hidden fixed inset-y-0 left-0 z-40 w-72 max-w-[85vw] bg-white border-r border-slate-200 min-h-screen lg:static lg:z-auto lg:block lg:w-64 lg:max-w-none">
   <div class="p-5 border-b border-slate-100">
     <p class="text-xs uppercase tracking-widest text-slate-400">Zouetech</p>
     <h1 class="text-xl font-bold text-slate-900">Finance ERP</h1>
@@ -26,3 +26,4 @@ $nav = [
     <?php endforeach; ?>
   </nav>
 </aside>
+<div id="sidebarBackdrop" class="fixed inset-0 z-30 hidden bg-slate-900/40 lg:hidden"></div>

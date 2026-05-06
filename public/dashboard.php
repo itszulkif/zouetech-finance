@@ -73,17 +73,17 @@ if (!in_array($filter, $allowedFilters, true)) {
               <h3 class="font-semibold">Today's Recent Transactions</h3>
               <a href="/zou-finance/public/transactions.php" class="rounded-lg border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50">View All</a>
             </div>
-            <div class="overflow-auto">
-              <table class="min-w-full text-sm">
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-xs sm:text-sm">
                 <thead>
                   <tr class="text-left border-b">
-                    <th class="py-2 pr-3">Recorded At</th>
+                    <th class="py-2 pr-3 hidden md:table-cell">Recorded At</th>
                     <th class="py-2 pr-3">Transaction Date</th>
-                    <th class="py-2 pr-3">Group</th>
+                    <th class="py-2 pr-3 hidden sm:table-cell">Group</th>
                     <th class="py-2 pr-3">Type</th>
                     <th class="py-2 pr-3">Partner</th>
-                    <th class="py-2 pr-3">Description</th>
-                    <th class="py-2 pr-3">Impact</th>
+                    <th class="py-2 pr-3 hidden lg:table-cell">Description</th>
+                    <th class="py-2 pr-3 hidden lg:table-cell">Impact</th>
                     <th class="py-2 pr-3">Amount</th>
                   </tr>
                 </thead>
@@ -98,13 +98,13 @@ if (!in_array($filter, $allowedFilters, true)) {
 
           <article class="bg-white rounded-2xl border border-slate-200 p-4">
             <h3 class="font-semibold mb-3">Partner Breakdown</h3>
-            <div class="overflow-auto">
-              <table class="min-w-full text-sm">
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-xs sm:text-sm">
                 <thead>
                   <tr class="text-left border-b">
                     <th class="py-2 pr-3">Partner</th>
                     <th class="py-2 pr-3">Share</th>
-                    <th class="py-2 pr-3">Used</th>
+                    <th class="py-2 pr-3 hidden sm:table-cell">Used</th>
                     <th class="py-2 pr-3">Remaining</th>
                   </tr>
                 </thead>
