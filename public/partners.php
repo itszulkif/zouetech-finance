@@ -19,6 +19,21 @@ $pageTitle = 'Partner Center';
     <section class="flex-1 min-w-0">
       <?php require __DIR__ . '/partials/header.php'; ?>
       <main class="p-4 md:p-6 grid grid-cols-1 gap-4">
+        <section class="grid md:grid-cols-3 gap-4">
+          <article class="bg-white rounded-2xl border border-slate-200 p-4">
+            <h3 class="font-semibold text-sm text-slate-700 mb-3">Partner Liabilities</h3>
+            <div id="partnerBalanceCards" class="space-y-2 text-sm"></div>
+          </article>
+          <article class="bg-white rounded-2xl border border-slate-200 p-4">
+            <h3 class="font-semibold text-sm text-slate-700 mb-2">Total Expenses</h3>
+            <p id="totalExpenseValue" class="text-2xl font-bold text-rose-600">PKR 0.00</p>
+          </article>
+          <article class="bg-white rounded-2xl border border-slate-200 p-4">
+            <h3 class="font-semibold text-sm text-slate-700 mb-2">Company Balance</h3>
+            <p id="companyBalanceValue" class="text-2xl font-bold text-emerald-600">PKR 0.00</p>
+          </article>
+        </section>
+
         <article class="bg-white rounded-2xl border border-slate-200 p-5">
           <div class="flex items-center justify-between mb-3">
             <h3 class="font-semibold text-lg">Partners</h3>

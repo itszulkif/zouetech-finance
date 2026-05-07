@@ -53,6 +53,7 @@ $pageTitle = 'Daily Expense Details';
                 </select>
               </label>
               <button id="expenseFilterApply" class="rounded-xl bg-blue-600 text-white px-4 py-2 text-sm">Apply</button>
+              <button id="expenseExportBtn" class="rounded-xl border border-slate-200 px-4 py-2 text-sm hover:bg-slate-50">Export to Excel</button>
             </div>
           </div>
           <div class="mb-3 flex flex-wrap gap-3 text-xs text-slate-600">

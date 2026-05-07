@@ -13,6 +13,7 @@ let incomeDetailsHasMore = true;
 let reimbursementHistoryPage = 1;
 const reimbursementHistoryLimit = 10;
 let reimbursementHistoryHasMore = true;
+const defaultExpenseLimit = 10;
 // Allow pages to opt into always-visible daily expense panel via global flag
 let dailyExpensePanelVisible = typeof window !== "undefined" && window.__DAILY_EXPENSE_PAGE__ ? true : false;
 let kpiChart;
@@ -22,6 +23,18 @@ const allowedRanges = new Set(["all", "daily", "weekly", "monthly", "yearly"]);
 const appSidebar = $("#appSidebar");
 const sidebarToggleBtn = $("#sidebarToggleBtn");
 const sidebarBackdrop = $("#sidebarBackdrop");
+const openProfileBtn = $("#openProfileBtn");
+const closeProfileBtn = $("#closeProfileBtn");
+const cancelProfileBtn = $("#cancelProfileBtn");
+const profileModal = $("#profileModal");
+const profileForm = $("#profileForm");
+const profileAvatar = $("#profileAvatar");
+const profileAvatarFallback = $("#profileAvatarFallback");
+const profilePreviewImage = $("#profilePreviewImage");
+const profilePictureInput = $("#profilePictureInput");
+const profileNameInput = $("#profileNameInput");
+const profileUsernameInput = $("#profileUsernameInput");
+const profilePasswordInput = $("#profilePasswordInput");
 
 function isMobileViewport() {
   return typeof window !== "undefined" && window.matchMedia("(max-width: 1023px)").matches;
@@ -73,6 +86,94 @@ function bindSidebarEvents() {
     if (event.key === "Escape") {
       closeSidebarOnMobile();
     }
+  });
+}
+
+function setAvatarDisplay(name, pictureUrl) {
+  const initialsSource = (name || profileUsernameInput?.value || "PR").trim();
+  const initials = initialsSource.slice(0, 2).toUpperCase();
+  if (profileAvatarFallback) profileAvatarFallback.textContent = initials || "PR";
+
+  if (profileAvatar && pictureUrl) {
+    profileAvatar.src = pictureUrl;
+    profileAvatar.classList.remove("hidden");
+    profileAvatarFallback?.classList.add("hidden");
+  } else if (profileAvatar) {
+    profileAvatar.removeAttribute("src");
+    profileAvatar.classList.add("hidden");
+    profileAvatarFallback?.classList.remove("hidden");
+  }
+
+  if (profilePreviewImage && pictureUrl) {
+    profilePreviewImage.src = pictureUrl;
+    profilePreviewImage.classList.remove("hidden");
+  } else if (profilePreviewImage) {
+    profilePreviewImage.removeAttribute("src");
+    profilePreviewImage.classList.add("hidden");
+  }
+}
+
+function openProfileModal() {
+  if (!profileModal) return;
+  profileModal.classList.remove("hidden");
+  profileModal.classList.add("flex");
+}
+
+function closeProfileModal() {
+  if (!profileModal) return;
+  profileModal.classList.add("hidden");
+  profileModal.classList.remove("flex");
+}
+
+async function loadProfile() {
+  if (!profileForm) return;
+  const data = await api("/zou-finance/api/profile.php");
+  if (profileNameInput) profileNameInput.value = data.name || "";
+  if (profileUsernameInput) profileUsernameInput.value = data.username || "";
+  if (profilePasswordInput) profilePasswordInput.value = "";
+  setAvatarDisplay(data.name || data.username || "PR", data.picture_url || "");
+}
+
+function bindProfileEvents() {
+  if (!profileForm) return;
+
+  openProfileBtn?.addEventListener("click", async () => {
+    await safeLoadWithToast(loadProfile);
+    openProfileModal();
+  });
+
+  closeProfileBtn?.addEventListener("click", closeProfileModal);
+  cancelProfileBtn?.addEventListener("click", closeProfileModal);
+  profileModal?.addEventListener("click", (event) => {
+    if (event.target === profileModal) {
+      closeProfileModal();
+    }
+  });
+
+  profilePictureInput?.addEventListener("change", () => {
+    const file = profilePictureInput.files?.[0];
+    if (!file) return;
+    const objectUrl = URL.createObjectURL(file);
+    setAvatarDisplay(profileNameInput?.value || profileUsernameInput?.value || "PR", objectUrl);
+  });
+
+  profileNameInput?.addEventListener("input", () => {
+    setAvatarDisplay(profileNameInput.value || profileUsernameInput?.value || "PR", profileAvatar?.src || "");
+  });
+
+  profileForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const formData = new FormData(profileForm);
+    await safeLoadWithToast(async () => {
+      const data = await api("/zou-finance/api/profile.php", { method: "POST", body: formData });
+      if (profileUsernameInput) profileUsernameInput.value = data.username || "";
+      if (profileNameInput) profileNameInput.value = data.name || "";
+      if (profilePasswordInput) profilePasswordInput.value = "";
+      if (profilePictureInput) profilePictureInput.value = "";
+      setAvatarDisplay(data.name || data.username || "PR", data.picture_url || "");
+      notify("Profile updated");
+      closeProfileModal();
+    });
   });
 }
 
@@ -151,6 +252,7 @@ function updateTxPaginationControls(rows = []) {
 }
 
 function updateExpensePaginationControls(rows = []) {
+  if (document.body?.dataset?.page === "expenses") return;
   expenseHasMore = rows.length >= expenseLimit;
   const prevBtn = $("#expensePrev");
   const nextBtn = $("#expenseNext");
@@ -181,13 +283,17 @@ function updateReimbursementHistoryPaginationControls(rows = []) {
 }
 
 function buildExpenseQuery() {
-  const selected = $("#expenseRange")?.value || "all";
+  const isExpensesPage = document.body?.dataset?.page === "expenses";
+  const selected = isExpensesPage
+    ? "all"
+    : ($(".expense-range-btn.bg-slate-900")?.dataset?.range || $("#expenseRange")?.value || "daily");
   const range = allowedRanges.has(selected) ? selected : "all";
   const type = $("#expenseTypeFilter")?.value || "all";
+  const expenseLimit = isExpensesPage ? 20 : defaultExpenseLimit;
   const params = new URLSearchParams({
     range,
     type,
-    page: String(expensePage),
+    page: String(isExpensesPage ? 1 : expensePage),
     limit: String(expenseLimit)
   });
   return params.toString();
@@ -232,9 +338,7 @@ async function applyFilters({ resetTransactions = false } = {}) {
 
 async function refreshAllData() {
   await Promise.all([loadDashboard(), loadPartners(), loadTransactions(), loadIncomePreview(), loadPartnerBalanceCards(), loadReimbursementModule()]);
-  if (dailyExpensePanelVisible) {
-    await Promise.all([loadExpenseHistory(), loadPartnerExpenseDetails()]);
-  }
+  await Promise.all([loadExpenseHistory(), loadPartnerExpenseDetails()]);
 }
 
 function supportsRangeFilter() {
@@ -311,24 +415,25 @@ async function loadIncomePreview() {
 
 async function loadExpenseHistory() {
   if (!has("#expenseHistoryRows")) return;
-  if (!dailyExpensePanelVisible) return;
   const data = await api(`/zou-finance/api/expenses.php?${buildExpenseQuery()}`);
-  const rows = data.expenses || [];
+  const rows = (data.expenses || []).slice().sort((a, b) => {
+    const dateA = `${a.transaction_date || ""} ${a.created_at || ""}`;
+    const dateB = `${b.transaction_date || ""} ${b.created_at || ""}`;
+    return dateA < dateB ? 1 : (dateA > dateB ? -1 : 0);
+  });
   $("#expenseHistoryRows").innerHTML = rows.map((r) => {
-    const rowClass = r.type === "company"
-      ? "bg-amber-50"
-      : (r.payment_mode === "company_pay" ? "bg-indigo-50" : "bg-rose-50");
+    const expenseType = r.type === "partner"
+      ? (r.payment_mode === "company_pay" ? "Partner (Company Reimburses)" : "Partner (Out-of-Pocket)")
+      : "Company Expense";
     return `
-    <tr class="border-b ${rowClass}">
-      <td class="py-2 pr-3">${r.created_at || "-"}</td>
+    <tr class="border-b">
       <td class="py-2 pr-3">${r.transaction_date || "-"}</td>
-      <td class="py-2 pr-3 capitalize">${r.type === "partner" ? `partner (${r.payment_mode === "company_pay" ? "company reimburses" : "out-of-pocket"})` : (r.type || "-")}</td>
-      <td class="py-2 pr-3">${r.partner_name || "-"}</td>
       <td class="py-2 pr-3">${r.description || "-"}</td>
+      <td class="py-2 pr-3">${expenseType}</td>
       <td class="py-2 pr-3">${formatPKR(r.amount)}</td>
     </tr>
   `;
-  }).join("") || `<tr><td class="py-2" colspan="6">No expense history</td></tr>`;
+  }).join("") || `<tr><td class="py-2" colspan="4">No expense history</td></tr>`;
   updateExpensePaginationControls(rows);
 }
 
@@ -354,23 +459,28 @@ async function loadPartnerExpenseDetails() {
 
 async function loadPartnerBalanceCards() {
   if (!has("#partnerBalanceCards")) return;
-  const selectedRange = $("#expenseRange")?.value || "all";
-  const range = dailyExpensePanelVisible && allowedRanges.has(selectedRange) ? selectedRange : "all";
+  const selectedRange = $(".expense-range-btn.bg-slate-900")?.dataset?.range
+    || $("#expenseRange")?.value
+    || "all";
+  const range = allowedRanges.has(selectedRange) ? selectedRange : "all";
   const data = await api(`/zou-finance/api/dashboard.php?range=${encodeURIComponent(range)}`);
   const rows = data.partner_breakdown || [];
   $("#partnerBalanceCards").innerHTML = rows.map((r) => {
     const liability = Number(r.remaining_balance || 0);
-    const hasLiability = liability > 0;
-    const status = hasLiability ? "Liability (Payable)" : "No Liability";
-    const statusClass = hasLiability ? "text-rose-600" : "text-emerald-600";
     return `
-      <article class="rounded-xl border border-slate-200 p-3 bg-white">
-        <p class="text-sm text-slate-600">${r.name}</p>
-        <p class="text-xs mt-1 ${statusClass}">${status}</p>
-        <p class="text-lg font-semibold mt-1 ${statusClass}">${formatPKR(liability)}</p>
-      </article>
+      <div class="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2">
+        <span class="text-slate-700">${r.name}</span>
+        <span class="${liability > 0 ? "text-rose-600" : "text-emerald-600"} font-semibold">${formatPKR(liability)}</span>
+      </div>
     `;
-  }).join("") || `<p class="text-sm text-slate-500">No partner balances found.</p>`;
+  }).join("") || `<p class="text-sm text-slate-500">No partner liabilities found.</p>`;
+  if (has("#totalExpenseValue")) {
+    $("#totalExpenseValue").textContent = formatPKR(data.total_expenses || 0);
+  }
+  if (has("#companyBalanceValue")) {
+    const companyBalance = Number(data.company_balance ?? data.net_balance ?? 0);
+    $("#companyBalanceValue").textContent = formatPKR(companyBalance);
+  }
 }
 
 function normalizeIncomeTypeLabel(type) {
@@ -497,32 +607,31 @@ function bindTransactionFilterEvents() {
 }
 
 function bindExpenseHistoryEvents() {
-  $("#toggleDailyExpensesBtn")?.addEventListener("click", async (e) => {
-    const panel = $("#dailyExpensePanel");
-    if (!panel) return;
-    dailyExpensePanelVisible = !dailyExpensePanelVisible;
-    panel.classList.toggle("hidden", !dailyExpensePanelVisible);
-    e.target.textContent = dailyExpensePanelVisible ? "Hide Daily Expense Details" : "Show Daily Expense Details";
-    if (dailyExpensePanelVisible) {
-      expensePage = 1;
-      if ($("#expenseRange")) $("#expenseRange").value = "daily";
-      await safeLoadWithToast(async () => {
-        await Promise.all([loadExpenseHistory(), loadPartnerExpenseDetails(), loadPartnerBalanceCards()]);
+  document.querySelectorAll(".expense-range-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      document.querySelectorAll(".expense-range-btn").forEach((otherBtn) => {
+        otherBtn.classList.remove("bg-slate-900", "text-white");
+        otherBtn.classList.add("text-slate-600");
       });
-    }
+      btn.classList.add("bg-slate-900", "text-white");
+      btn.classList.remove("text-slate-600");
+      expensePage = 1;
+      await safeLoadWithToast(async () => {
+        await Promise.all([loadExpenseHistory(), loadPartnerBalanceCards()]);
+      });
+    });
   });
+
   $("#expenseFilterApply")?.addEventListener("click", async () => {
-    if (!dailyExpensePanelVisible) return;
     expensePage = 1;
     await safeLoadWithToast(async () => {
-      await Promise.all([loadExpenseHistory(), loadPartnerExpenseDetails(), loadPartnerBalanceCards()]);
+      await Promise.all([loadExpenseHistory(), loadPartnerBalanceCards()]);
     });
   });
   $("#expenseRange")?.addEventListener("change", async () => {
-    if (!dailyExpensePanelVisible) return;
     expensePage = 1;
     await safeLoadWithToast(async () => {
-      await Promise.all([loadExpenseHistory(), loadPartnerExpenseDetails(), loadPartnerBalanceCards()]);
+      await Promise.all([loadExpenseHistory(), loadPartnerBalanceCards()]);
     });
   });
   $("#expenseTypeFilter")?.addEventListener("change", async () => {
@@ -530,14 +639,49 @@ function bindExpenseHistoryEvents() {
     await safeLoadWithToast(loadExpenseHistory);
   });
   $("#expensePrev")?.addEventListener("click", async () => {
+    if (document.body?.dataset?.page === "expenses") return;
     if (expensePage <= 1) return;
     expensePage = Math.max(1, expensePage - 1);
     await safeLoadWithToast(loadExpenseHistory);
   });
   $("#expenseNext")?.addEventListener("click", async () => {
+    if (document.body?.dataset?.page === "expenses") return;
     if (!expenseHasMore) return;
     expensePage += 1;
     await safeLoadWithToast(loadExpenseHistory);
+  });
+
+  $("#expenseExportBtn")?.addEventListener("click", async () => {
+    await safeLoadWithToast(async () => {
+      const selected = document.body?.dataset?.page === "expenses"
+        ? "all"
+        : ($(".expense-range-btn.bg-slate-900")?.dataset?.range || $("#expenseRange")?.value || "daily");
+      const query = new URLSearchParams({ range: selected, type: "all", page: "1", limit: "2000" }).toString();
+      const data = await api(`/zou-finance/api/expenses.php?${query}`);
+      const rows = data.expenses || [];
+      const csvRows = [
+        ["Transaction Date", "Detailed Note", "Expense Type", "Amount"],
+        ...rows.map((r) => [
+          r.transaction_date || "-",
+          (r.description || "-").replace(/"/g, '""'),
+          r.type === "partner"
+            ? (r.payment_mode === "company_pay" ? "Partner (Company Reimburses)" : "Partner (Out-of-Pocket)")
+            : "Company Expense",
+          String(r.amount || 0)
+        ])
+      ];
+      const csv = csvRows.map((cols) => cols.map((v) => `"${String(v)}"`).join(",")).join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `expenses-${selected}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      notify("Expense report exported");
+    });
   });
 }
 
@@ -763,9 +907,7 @@ if (expenseForm) {
       if (expenseDateField) expenseDateField.value = new Date().toISOString().slice(0, 10);
       togglePartnerExpenseFields("company");
       await Promise.all([refreshRangeDependentData(), loadPartnerBalanceCards()]);
-      if (dailyExpensePanelVisible) {
-        await Promise.all([loadExpenseHistory(), loadPartnerExpenseDetails()]);
-      }
+      await Promise.all([loadExpenseHistory(), loadPartnerExpenseDetails()]);
       notify("Expense saved");
     } catch (err) { notify(err.message, false); }
   });
@@ -793,9 +935,11 @@ bindExpenseHistoryEvents();
 bindIncomeDetailsEvents();
 bindReimbursementHistoryEvents();
 bindSidebarEvents();
+bindProfileEvents();
 
 (async () => {
   try {
+    await loadProfile();
     await refreshAllData();
     await Promise.all([loadIncomeDetails(), loadReimbursementHistory()]);
   } catch (err) {
