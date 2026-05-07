@@ -30,10 +30,11 @@ requirePartnerPage();
     </section>
   </main>
   <script>
+    const withBase = (path) => path;
     const f = new Intl.NumberFormat("en-PK", { style: "currency", currency: "PKR" });
     async function load() {
       const range = document.getElementById("range").value;
-      const res = await fetch(`/zou-finance/api/partner_ledger.php?range=${encodeURIComponent(range)}`);
+      const res = await fetch(withBase(`/api/partner_ledger.php?range=${encodeURIComponent(range)}`));
       const json = await res.json();
       if (!json.success) return;
       const s = json.data.summary;

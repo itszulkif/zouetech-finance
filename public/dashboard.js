@@ -1,4 +1,5 @@
 const $ = (s) => document.querySelector(s);
+const withBase = (path) => path;
 const toast = $("#toast");
 let txPage = 1;
 const txLimit = 10;
@@ -127,7 +128,7 @@ function closeProfileModal() {
 
 async function loadProfile() {
   if (!profileForm) return;
-  const data = await api("/zou-finance/api/profile.php");
+  const data = await api(withBase("/api/profile.php"));
   if (profileNameInput) profileNameInput.value = data.name || "";
   if (profileUsernameInput) profileUsernameInput.value = data.username || "";
   if (profilePasswordInput) profilePasswordInput.value = "";
@@ -165,7 +166,7 @@ function bindProfileEvents() {
     event.preventDefault();
     const formData = new FormData(profileForm);
     await safeLoadWithToast(async () => {
-      const data = await api("/zou-finance/api/profile.php", { method: "POST", body: formData });
+      const data = await api(withBase("/api/profile.php"), { method: "POST", body: formData });
       if (profileUsernameInput) profileUsernameInput.value = data.username || "";
       if (profileNameInput) profileNameInput.value = data.name || "";
       if (profilePasswordInput) profilePasswordInput.value = "";
@@ -364,7 +365,7 @@ async function safeLoadWithToast(loader) {
 async function loadDashboard() {
   if (!has("#kpis") && !has("#partnerBreakdownRows") && !has("#kpiChart")) return;
   const query = buildRangeQuery();
-  const url = `/zou-finance/api/dashboard.php?${query}`;
+  const url = withBase(`/api/dashboard.php?${query}`);
   const data = await api(url);
   renderKpis(data);
   renderPartnerBreakdown(data.partner_breakdown || []);
@@ -374,7 +375,7 @@ async function loadDashboard() {
 
 async function loadTransactions() {
   if (!has("#transactionRows")) return;
-  const data = await api(`/zou-finance/api/transactions.php?${buildTransactionQuery()}&page=${txPage}&limit=${txLimit}`);
+  const data = await api(withBase(`/api/transactions.php?${buildTransactionQuery()}&page=${txPage}&limit=${txLimit}`));
   const rows = data.transactions || [];
   $("#transactionRows").innerHTML = rows.map((t) => {
     let rowClass = "";
@@ -404,7 +405,7 @@ async function loadIncomePreview() {
   if (!has("#incomeForm")) return;
   const amount = Number($("#incomeForm [name='amount']")?.value || 0);
   const type = $("#incomeForm [name='type']")?.value || "distributed";
-  const data = await api(`/zou-finance/api/income_preview.php?amount=${encodeURIComponent(amount)}&type=${encodeURIComponent(type)}`);
+  const data = await api(withBase(`/api/income_preview.php?amount=${encodeURIComponent(amount)}&type=${encodeURIComponent(type)}`));
   const modeLabel = type === "distributed" ? "Mode: 50/50 Split" : "Mode: 100% Company";
   if (has("#incomePreview")) $("#incomePreview").textContent = `${modeLabel} | Company: ${formatPKR(data.company_share)} | Partner Pool: ${formatPKR(data.partner_pool)}`;
   if (has("#incomeDistributionPreview")) {
@@ -415,7 +416,7 @@ async function loadIncomePreview() {
 
 async function loadExpenseHistory() {
   if (!has("#expenseHistoryRows")) return;
-  const data = await api(`/zou-finance/api/expenses.php?${buildExpenseQuery()}`);
+  const data = await api(withBase(`/api/expenses.php?${buildExpenseQuery()}`));
   const rows = (data.expenses || []).slice().sort((a, b) => {
     const dateA = `${a.transaction_date || ""} ${a.created_at || ""}`;
     const dateB = `${b.transaction_date || ""} ${b.created_at || ""}`;
@@ -441,7 +442,7 @@ async function loadPartnerExpenseDetails() {
   if (!has("#partnerExpenseRows")) return;
   if (!dailyExpensePanelVisible) return;
   const range = $("#expenseRange")?.value || "all";
-  const data = await api(`/zou-finance/api/expenses.php?range=${encodeURIComponent(range)}&type=partner&page=1&limit=10`);
+  const data = await api(withBase(`/api/expenses.php?range=${encodeURIComponent(range)}&type=partner&page=1&limit=10`));
   const rows = data.expenses || [];
   $("#partnerExpenseRows").innerHTML = rows.map((r) => `
     <tr class="border-b ${r.payment_mode === "company_pay" ? "bg-indigo-50" : "bg-rose-50"}">
@@ -463,7 +464,7 @@ async function loadPartnerBalanceCards() {
     || $("#expenseRange")?.value
     || "all";
   const range = allowedRanges.has(selectedRange) ? selectedRange : "all";
-  const data = await api(`/zou-finance/api/dashboard.php?range=${encodeURIComponent(range)}`);
+  const data = await api(withBase(`/api/dashboard.php?range=${encodeURIComponent(range)}`));
   const rows = data.partner_breakdown || [];
   $("#partnerBalanceCards").innerHTML = rows.map((r) => {
     const liability = Number(r.remaining_balance || 0);
@@ -492,7 +493,7 @@ function normalizeIncomeTypeLabel(type) {
 
 async function loadIncomeDetails() {
   if (!has("#incomeDetailsRows")) return;
-  const data = await api(`/zou-finance/api/income_details.php?${buildIncomeDetailsQuery()}`);
+  const data = await api(withBase(`/api/income_details.php?${buildIncomeDetailsQuery()}`));
   const rows = data.income || [];
   $("#incomeDetailsRows").innerHTML = rows.map((r) => `
     <tr class="border-b">
@@ -512,7 +513,7 @@ async function loadIncomeDetails() {
 
 async function loadReimbursementHistory() {
   if (!has("#reimbursementRows")) return;
-  const data = await api(`/zou-finance/api/reimbursement_history.php?${buildReimbursementHistoryQuery()}`);
+  const data = await api(withBase(`/api/reimbursement_history.php?${buildReimbursementHistoryQuery()}`));
   const rows = data.reimbursements || [];
   $("#reimbursementRows").innerHTML = rows.map((r) => `
     <tr class="border-b bg-indigo-50">
@@ -538,7 +539,7 @@ function renderReimbursementOutstanding() {
 
 async function loadReimbursementModule() {
   if (!has("#reimbursementForm")) return;
-  const data = await api("/zou-finance/api/reimbursements.php?range=all");
+  const data = await api(withBase("/api/reimbursements.php?range=all"));
   const rows = (data.partners || []).filter((row) => Number(row.remaining_balance || 0) > 0);
   reimbursementLiabilities = rows;
 
@@ -657,7 +658,7 @@ function bindExpenseHistoryEvents() {
         ? "all"
         : ($(".expense-range-btn.bg-slate-900")?.dataset?.range || $("#expenseRange")?.value || "daily");
       const query = new URLSearchParams({ range: selected, type: "all", page: "1", limit: "2000" }).toString();
-      const data = await api(`/zou-finance/api/expenses.php?${query}`);
+      const data = await api(withBase(`/api/expenses.php?${query}`));
       const rows = data.expenses || [];
       const csvRows = [
         ["Transaction Date", "Detailed Note", "Expense Type", "Amount"],
@@ -790,7 +791,7 @@ function renderPartners(partners, total) {
 
 async function loadPartners() {
   if (!has("#partnerRows") && !has("#partnerSelect") && !has("#ledgerPartner")) return;
-  const data = await api("/zou-finance/api/partners.php?page=1&limit=100");
+  const data = await api(withBase("/api/partners.php?page=1&limit=100"));
   renderPartners(data.partners || [], data.total_percentage || 0);
 }
 
@@ -799,7 +800,7 @@ if (partnerForm) {
   partnerForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     try {
-      await api("/zou-finance/api/partners.php", { method: "POST", body: new FormData(e.target) });
+      await api(withBase("/api/partners.php"), { method: "POST", body: new FormData(e.target) });
       e.target.reset();
       await loadPartners();
       notify("Partner added");
@@ -810,7 +811,7 @@ if (partnerForm) {
 document.addEventListener("click", async (e) => {
   if (!(e.target instanceof Element) || !e.target.classList.contains("delete-partner")) return;
   try {
-    await api("/zou-finance/api/partners.php", {
+    await api(withBase("/api/partners.php"), {
       method: "DELETE",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: `id=${encodeURIComponent(e.target.dataset.id)}`
@@ -832,14 +833,14 @@ if (incomeForm) {
     try {
       const selectedType = $("#incomeForm [name='type']")?.value || "distributed";
       if (selectedType === "distributed") {
-        const partnersData = await api("/zou-finance/api/partners.php?page=1&limit=1");
+        const partnersData = await api(withBase("/api/partners.php?page=1&limit=1"));
         const totalPercentage = Number(partnersData.total_percentage || 0);
         if (Math.abs(totalPercentage - 100) > 0.01) {
           notify(`Cannot save Normal Income. Partner total is ${totalPercentage.toFixed(2)}% (required 100%).`, false);
           return;
         }
       }
-      await api("/zou-finance/api/income.php", { method: "POST", body: new FormData(e.target) });
+      await api(withBase("/api/income.php"), { method: "POST", body: new FormData(e.target) });
       e.target.reset();
       if (incomeDateField) {
         incomeDateField.value = new Date().toISOString().slice(0, 10);
@@ -883,7 +884,7 @@ if (reimbursementForm) {
         return;
       }
 
-      await api("/zou-finance/api/reimbursements.php", { method: "POST", body: formData });
+      await api(withBase("/api/reimbursements.php"), { method: "POST", body: formData });
       form.reset();
       if (reimbursementDateField) reimbursementDateField.value = new Date().toISOString().slice(0, 10);
       await refreshAllData();
@@ -902,7 +903,7 @@ if (expenseForm) {
   expenseForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     try {
-      await api("/zou-finance/api/expenses.php", { method: "POST", body: new FormData(e.target) });
+      await api(withBase("/api/expenses.php"), { method: "POST", body: new FormData(e.target) });
       e.target.reset();
       if (expenseDateField) expenseDateField.value = new Date().toISOString().slice(0, 10);
       togglePartnerExpenseFields("company");
@@ -925,8 +926,8 @@ bindRangeEvents();
 bindReloadEvent();
 
 $("#logoutBtn")?.addEventListener("click", async () => {
-  await api("/zou-finance/api/logout.php", { method: "POST" });
-  window.location.href = "/zou-finance/public/login.php";
+  await api(withBase("/api/logout.php"), { method: "POST" });
+  window.location.href = withBase("/public/login.php");
 });
 
 bindTransactionPaginationEvents();

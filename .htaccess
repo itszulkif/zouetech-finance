@@ -1,0 +1,21 @@
+Options -Indexes
+DirectoryIndex index.php
+
+RewriteEngine On
+
+# Open app directly when domain/folder root is visited
+RewriteRule ^$ index.php [L]
+
+# Friendly routes without /public/*.php
+RewriteRule ^login/?$ public/login.php [L,QSA,NC]
+RewriteRule ^dashboard/?$ public/dashboard.php [L,QSA,NC]
+RewriteRule ^income/?$ public/income.php [L,QSA,NC]
+RewriteRule ^expenses/?$ public/expenses.php [L,QSA,NC]
+RewriteRule ^partners/?$ public/partners.php [L,QSA,NC]
+RewriteRule ^reports/?$ public/reports.php [L,QSA,NC]
+RewriteRule ^transactions/?$ public/transactions.php [L,QSA,NC]
+RewriteRule ^partner-login/?$ public/partner-login.php [L,QSA,NC]
+RewriteRule ^partner-ledger/?$ public/partner-ledger.php [L,QSA,NC]
+RewriteRule ^income-details/?$ public/income-details.php [L,QSA,NC]
+RewriteRule ^expenses-details/?$ public/expenses-details.php [L,QSA,NC]
+RewriteRule ^reimbursement-details/?$ public/reimbursement-details.php [L,QSA,NC]

@@ -23,7 +23,7 @@ $pageTitle = 'Income Management';
         <article class="bg-white rounded-2xl border border-slate-200 p-5 max-w-4xl">
           <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
             <h3 class="font-semibold text-lg">Add Income</h3>
-            <a href="/zou-finance/public/income-details.php" class="rounded-xl border border-slate-200 px-4 py-2 text-sm hover:bg-slate-50">Show Income Details</a>
+            <a href="<?= htmlspecialchars(app_url('/public/income-details.php')) ?>" class="rounded-xl border border-slate-200 px-4 py-2 text-sm hover:bg-slate-50">Show Income Details</a>
           </div>
           <p class="text-sm text-slate-500 mb-4">Normal income follows Zouetech formula (50% Company + 50% Partner Pool).</p>
           <form id="incomeForm" class="grid md:grid-cols-2 gap-3">
@@ -50,7 +50,7 @@ $pageTitle = 'Income Management';
         <article class="bg-white rounded-2xl border border-slate-200 p-5 max-w-4xl mt-4">
           <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
             <h3 class="font-semibold text-lg">Partner Reimbursement</h3>
-            <a href="/zou-finance/public/reimbursement-details.php" class="rounded-xl border border-slate-200 px-4 py-2 text-sm hover:bg-slate-50">Show Reimbursement History</a>
+            <a href="<?= htmlspecialchars(app_url('/public/reimbursement-details.php')) ?>" class="rounded-xl border border-slate-200 px-4 py-2 text-sm hover:bg-slate-50">Show Reimbursement History</a>
           </div>
           <p class="text-sm text-slate-500 mb-4">Settle partner out-of-pocket liabilities from company balance. This is separate from 50/50 income distribution.</p>
           <div id="reimbursementLiabilityCards" class="grid sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-4"></div>
@@ -77,6 +77,6 @@ $pageTitle = 'Income Management';
     </section>
   </div>
   <div id="toast" class="fixed right-4 top-4 hidden bg-slate-900 text-white px-4 py-2 rounded-xl text-sm"></div>
-  <script src="/zou-finance/public/dashboard.js"></script>
+  <script src="<?= htmlspecialchars(app_url('/public/dashboard.js')) ?>"></script>
 </body>
 </html>

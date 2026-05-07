@@ -24,7 +24,7 @@ $pageTitle = 'Daily Expense Details';
             <h3 class="font-semibold text-lg">Daily Expense Details</h3>
             <p class="text-sm text-slate-500">Yahan per aap ko tamam expenses list ki form mein milenge, filters ke sath.</p>
           </div>
-          <a href="/zou-finance/public/expenses.php" class="text-sm rounded-xl border border-slate-200 px-4 py-2 hover:bg-slate-50">
+          <a href="<?= htmlspecialchars(app_url('/public/expenses.php')) ?>" class="text-sm rounded-xl border border-slate-200 px-4 py-2 hover:bg-slate-50">
             Back to Expense Entry
           </a>
         </article>
@@ -111,7 +111,7 @@ $pageTitle = 'Daily Expense Details';
     // Mark this page as dedicated daily expense details view
     window.__DAILY_EXPENSE_PAGE__ = true;
   </script>
-  <script src="/zou-finance/public/dashboard.js"></script>
+  <script src="<?= htmlspecialchars(app_url('/public/dashboard.js')) ?>"></script>
 </body>
 </html>
 

@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__ . '/../includes/auth.php';
 if (isPartnerLoggedIn()) {
-    header('Location: /zou-finance/public/partner-ledger.php');
+    header('Location: ' . app_url('/public/partner-ledger.php'));
     exit;
 }
 ?>
@@ -26,12 +26,13 @@ if (isPartnerLoggedIn()) {
     <p id="msg" class="mt-3 text-sm text-rose-600"></p>
   </section>
   <script>
+    const withBase = (path) => path;
     document.getElementById("partnerLoginForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const res = await fetch("/zou-finance/api/partner_login.php", { method: "POST", body: new FormData(e.target) });
+      const res = await fetch(withBase("/api/partner_login.php"), { method: "POST", body: new FormData(e.target) });
       const data = await res.json();
       if (data.success) {
-        window.location.href = "/zou-finance/public/partner-ledger.php";
+        window.location.href = withBase("/public/partner-ledger.php");
         return;
       }
       document.getElementById("msg").textContent = data.message || "Login failed";

@@ -31,7 +31,7 @@ function getPublicPictureUrl(?string $path): string
     if (!$path) {
         return '';
     }
-    return '/zou-finance/' . ltrim(str_replace('\\', '/', $path), '/');
+    return app_url('/' . ltrim(str_replace('\\', '/', $path), '/'));
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {

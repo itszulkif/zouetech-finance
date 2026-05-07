@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__ . '/../includes/auth.php';
 if (isLoggedIn()) {
-    header('Location: /zou-finance/public/dashboard.php');
+    header('Location: ' . app_url('/public/dashboard.php'));
     exit;
 }
 ?>
@@ -35,6 +35,7 @@ if (isLoggedIn()) {
     </section>
   </main>
   <script>
+    const withBase = (path) => path;
     const msg = document.getElementById('msg');
     const show = (t, ok = true) => {
       msg.className = `mt-4 text-sm ${ok ? 'text-emerald-600' : 'text-rose-600'}`;
@@ -43,10 +44,10 @@ if (isLoggedIn()) {
 
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const res = await fetch('/zou-finance/api/login.php', { method: 'POST', body: new FormData(e.target) });
+      const res = await fetch(withBase('/api/login.php'), { method: 'POST', body: new FormData(e.target) });
       const json = await res.json();
       if (json.success) {
-        window.location.href = '/zou-finance/public/dashboard.php';
+        window.location.href = withBase('/public/dashboard.php');
         return;
       }
       show(json.message, false);

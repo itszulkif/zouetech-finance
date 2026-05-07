@@ -24,7 +24,7 @@ $pageTitle = 'Reimbursement History';
             <h3 class="font-semibold text-lg">Reimbursement History</h3>
             <p class="text-sm text-slate-500">Track all partner reimbursement payouts made from company balance.</p>
           </div>
-          <a href="/zou-finance/public/income.php" class="text-sm rounded-xl border border-slate-200 px-4 py-2 hover:bg-slate-50">
+          <a href="<?= htmlspecialchars(app_url('/public/income.php')) ?>" class="text-sm rounded-xl border border-slate-200 px-4 py-2 hover:bg-slate-50">
             Back to Income Management
           </a>
         </article>
@@ -71,6 +71,6 @@ $pageTitle = 'Reimbursement History';
     </section>
   </div>
   <div id="toast" class="fixed right-4 top-4 hidden bg-slate-900 text-white px-4 py-2 rounded-xl text-sm"></div>
-  <script src="/zou-finance/public/dashboard.js"></script>
+  <script src="<?= htmlspecialchars(app_url('/public/dashboard.js')) ?>"></script>
 </body>
 </html>

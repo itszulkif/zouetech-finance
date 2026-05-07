@@ -55,7 +55,7 @@ $pageTitle = 'Expense Tracker';
               </table>
             </div>
             <div class="mt-3 text-right">
-              <a href="/zou-finance/public/expenses-details.php" class="rounded-lg border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 inline-flex">View All</a>
+              <a href="<?= htmlspecialchars(app_url('/public/expenses-details.php')) ?>" class="rounded-lg border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 inline-flex">View All</a>
             </div>
           </article>
 
@@ -88,6 +88,6 @@ $pageTitle = 'Expense Tracker';
     </section>
   </div>
   <div id="toast" class="fixed right-4 top-4 hidden bg-slate-900 text-white px-4 py-2 rounded-xl text-sm"></div>
-  <script src="/zou-finance/public/dashboard.js"></script>
+  <script src="<?= htmlspecialchars(app_url('/public/dashboard.js')) ?>"></script>
 </body>
 </html>

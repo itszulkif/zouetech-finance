@@ -14,3 +14,11 @@ const DB_USER = 'root';
 const DB_PASS = '';
 
 const LOG_FILE = __DIR__ . '/../logs/app.log';
+
+if (!function_exists('app_url')) {
+    function app_url(string $path = '/'): string
+    {
+        $normalizedPath = '/' . ltrim($path, '/');
+        return $normalizedPath;
+    }
+}

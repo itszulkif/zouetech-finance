@@ -65,7 +65,7 @@ $pageTitle = 'All Transactions';
     </section>
   </div>
   <div id="toast" class="fixed right-4 top-4 hidden bg-slate-900 text-white px-4 py-2 rounded-xl text-sm"></div>
-  <script src="/zou-finance/public/dashboard.js"></script>
+  <script src="<?= htmlspecialchars(app_url('/public/dashboard.js')) ?>"></script>
 </body>
 </html>
 

@@ -109,8 +109,9 @@ $pageTitle = 'Partner Center';
     </section>
   </div>
   <div id="toast" class="fixed right-4 top-4 hidden bg-slate-900 text-white px-4 py-2 rounded-xl text-sm"></div>
-  <script src="/zou-finance/public/dashboard.js"></script>
+  <script src="<?= htmlspecialchars(app_url('/public/dashboard.js')) ?>"></script>
   <script>
+    const withBase = (path) => path;
     const f = new Intl.NumberFormat("en-PK", { style: "currency", currency: "PKR" });
     let partnersCache = [];
 
@@ -139,7 +140,7 @@ $pageTitle = 'Partner Center';
     }
 
     async function loadPartnersCenter() {
-      const data = await api("/zou-finance/api/partners.php?page=1&limit=100");
+      const data = await api(withBase("/api/partners.php?page=1&limit=100"));
       renderLedgerPartnerSelect(data.partners || []);
     }
 
@@ -162,7 +163,7 @@ $pageTitle = 'Partner Center';
       if (!partnerId) return;
       const range = document.getElementById("ledgerRange")?.value || "monthly";
 
-      const json = await api(`/zou-finance/api/partner_ledger_details.php?partner_id=${encodeURIComponent(partnerId)}&range=${encodeURIComponent(range)}`);
+      const json = await api(withBase(`/api/partner_ledger_details.php?partner_id=${encodeURIComponent(partnerId)}&range=${encodeURIComponent(range)}`));
       const payload = json;
 
       const s = payload.summary || {};

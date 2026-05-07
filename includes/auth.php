@@ -31,7 +31,7 @@ function requireAuthJson(): void
 function requireAuthPage(): void
 {
     if (!isLoggedIn()) {
-        header('Location: /zou-finance/public/login.php');
+        header('Location: ' . app_url('/public/login.php'));
         exit;
     }
 }
@@ -39,7 +39,7 @@ function requireAuthPage(): void
 function requirePartnerPage(): void
 {
     if (!isPartnerLoggedIn()) {
-        header('Location: /zou-finance/public/partner-login.php');
+        header('Location: ' . app_url('/public/partner-login.php'));
         exit;
     }
 }

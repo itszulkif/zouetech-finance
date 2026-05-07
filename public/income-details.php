@@ -24,7 +24,7 @@ $pageTitle = 'Income Details';
             <h3 class="font-semibold text-lg">Income Details</h3>
             <p class="text-sm text-slate-500">Detailed view of all income entries with period filters.</p>
           </div>
-          <a href="/zou-finance/public/income.php" class="text-sm rounded-xl border border-slate-200 px-4 py-2 hover:bg-slate-50">
+          <a href="<?= htmlspecialchars(app_url('/public/income.php')) ?>" class="text-sm rounded-xl border border-slate-200 px-4 py-2 hover:bg-slate-50">
             Back to Income Management
           </a>
         </article>
@@ -82,6 +82,6 @@ $pageTitle = 'Income Details';
     </section>
   </div>
   <div id="toast" class="fixed right-4 top-4 hidden bg-slate-900 text-white px-4 py-2 rounded-xl text-sm"></div>
-  <script src="/zou-finance/public/dashboard.js"></script>
+  <script src="<?= htmlspecialchars(app_url('/public/dashboard.js')) ?>"></script>
 </body>
 </html>

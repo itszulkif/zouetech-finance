@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 $activePage = $activePage ?? 'dashboard';
 $nav = [
-    'dashboard' => ['label' => 'Dashboard', 'href' => '/zou-finance/public/dashboard.php'],
-    'income' => ['label' => 'Income Management', 'href' => '/zou-finance/public/income.php'],
-    'expenses' => ['label' => 'Expense Tracker', 'href' => '/zou-finance/public/expenses.php'],
-    'partners' => ['label' => 'Partner Center', 'href' => '/zou-finance/public/partners.php'],
-    'reports' => ['label' => 'Reports', 'href' => '/zou-finance/public/reports.php'],
+    'dashboard' => ['label' => 'Dashboard', 'href' => app_url('/public/dashboard.php')],
+    'income' => ['label' => 'Income Management', 'href' => app_url('/public/income.php')],
+    'expenses' => ['label' => 'Expense Tracker', 'href' => app_url('/public/expenses.php')],
+    'partners' => ['label' => 'Partner Center', 'href' => app_url('/public/partners.php')],
+    'reports' => ['label' => 'Reports', 'href' => app_url('/public/reports.php')],
 ];
 ?>
 <aside id="appSidebar" class="hidden fixed inset-y-0 left-0 z-40 w-72 max-w-[85vw] bg-white border-r border-slate-200 min-h-screen lg:static lg:z-auto lg:block lg:w-64 lg:max-w-none">

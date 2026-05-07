@@ -58,10 +58,10 @@ if (!in_array($filter, $allowedFilters, true)) {
             <div>
               <h3 class="font-semibold mb-2">Quick Actions</h3>
               <div class="space-y-2 text-sm">
-                <a class="block rounded-lg border border-slate-200 px-3 py-2 hover:bg-slate-50" href="/zou-finance/public/income.php">Add Income</a>
-                <a class="block rounded-lg border border-slate-200 px-3 py-2 hover:bg-slate-50" href="/zou-finance/public/expenses.php">Record Expense</a>
-                <a class="block rounded-lg border border-slate-200 px-3 py-2 hover:bg-slate-50" href="/zou-finance/public/partners.php">Manage Partners</a>
-                <a class="block rounded-lg border border-slate-200 px-3 py-2 hover:bg-slate-50" href="/zou-finance/public/reports.php">Open Full Reports</a>
+                <a class="block rounded-lg border border-slate-200 px-3 py-2 hover:bg-slate-50" href="<?= htmlspecialchars(app_url('/public/income.php')) ?>">Add Income</a>
+                <a class="block rounded-lg border border-slate-200 px-3 py-2 hover:bg-slate-50" href="<?= htmlspecialchars(app_url('/public/expenses.php')) ?>">Record Expense</a>
+                <a class="block rounded-lg border border-slate-200 px-3 py-2 hover:bg-slate-50" href="<?= htmlspecialchars(app_url('/public/partners.php')) ?>">Manage Partners</a>
+                <a class="block rounded-lg border border-slate-200 px-3 py-2 hover:bg-slate-50" href="<?= htmlspecialchars(app_url('/public/reports.php')) ?>">Open Full Reports</a>
               </div>
             </div>
           </article>
@@ -71,7 +71,7 @@ if (!in_array($filter, $allowedFilters, true)) {
           <article class="bg-white rounded-2xl border border-slate-200 p-4">
             <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
               <h3 class="font-semibold">Today's Recent Transactions</h3>
-              <a href="/zou-finance/public/transactions.php" class="rounded-lg border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50">View All</a>
+              <a href="<?= htmlspecialchars(app_url('/public/transactions.php')) ?>" class="rounded-lg border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50">View All</a>
             </div>
             <div class="overflow-x-auto">
               <table class="min-w-full text-xs sm:text-sm">
@@ -117,6 +117,6 @@ if (!in_array($filter, $allowedFilters, true)) {
     </section>
   </div>
   <div id="toast" class="fixed right-4 top-4 hidden bg-slate-900 text-white px-4 py-2 rounded-xl text-sm"></div>
-  <script src="/zou-finance/public/dashboard.js"></script>
+  <script src="<?= htmlspecialchars(app_url('/public/dashboard.js')) ?>"></script>
 </body>
 </html>
