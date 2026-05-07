@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 06, 2026 at 03:46 PM
+-- Generation Time: May 07, 2026 at 03:51 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -30,7 +30,9 @@ SET time_zone = "+00:00";
 CREATE TABLE `admin_users` (
   `id` int(10) UNSIGNED NOT NULL,
   `username` varchar(100) NOT NULL,
+  `name` varchar(150) DEFAULT NULL,
   `password_hash` varchar(255) NOT NULL,
+  `picture_path` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -38,8 +40,8 @@ CREATE TABLE `admin_users` (
 -- Dumping data for table `admin_users`
 --
 
-INSERT INTO `admin_users` (`id`, `username`, `password_hash`, `created_at`) VALUES
-(1, 'zulkif@gmail.com', '$2y$10$tuzpWLtEmx05EdBbZPDcd.NaWOShY.WNZQltYzfuGg8wmf/SHuWKK', '2026-05-05 13:16:46');
+INSERT INTO `admin_users` (`id`, `username`, `name`, `password_hash`, `picture_path`, `created_at`) VALUES
+(1, 'zulkif@gmail.com', 'zulkif', '$2y$10$gw6zOjzeKcGh.NJgTmdg6eBytJJ1wjPYhvjTe61aFwtH/CtJbLqe2', 'public/uploads/profiles/admin_1_1778161039.png', '2026-05-05 13:16:46');
 
 -- --------------------------------------------------------
 
@@ -55,6 +57,25 @@ CREATE TABLE `expenses` (
   `description` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `expenses`
+--
+
+INSERT INTO `expenses` (`id`, `amount`, `type`, `partner_id`, `description`, `created_at`) VALUES
+(42, 1000.00, 'company', NULL, 'tea', '2026-05-05 19:00:00'),
+(43, 20000.00, 'partner', 21, 'charis', '2026-05-06 19:00:00'),
+(44, 10000.00, 'partner', 21, 'REIMBURSEMENT: company pay', '2026-05-07 19:00:00'),
+(45, 10000.00, 'partner', 22, '', '2026-05-06 19:00:00'),
+(46, 3000.00, 'partner', 22, 'amount pay', '2026-05-06 19:00:00'),
+(47, 10000.00, 'partner', 22, '', '2026-05-06 19:00:00'),
+(48, 10000.00, 'partner', 21, 'REIMBURSEMENT: Partner reimbursement paid by company', '2026-05-06 19:00:00'),
+(49, 31000.00, 'company', NULL, '', '2026-05-06 19:00:00'),
+(50, 1000.00, 'company', NULL, '', '2026-05-06 19:00:00'),
+(51, 199.99, 'partner', 21, 'tea', '2026-05-06 19:00:00'),
+(52, 300.00, 'partner', 21, 'tea tea', '2026-05-07 19:00:00'),
+(53, 200.00, 'partner', 21, 'tea pepsi', '2026-05-07 19:00:00'),
+(54, 1000.00, 'company', NULL, 'tea', '2026-05-06 19:00:00');
 
 -- --------------------------------------------------------
 
@@ -74,7 +95,10 @@ CREATE TABLE `income` (
 --
 
 INSERT INTO `income` (`id`, `amount`, `type`, `created_at`) VALUES
-(23, 0.12, 'distributed', '2026-05-05 19:00:00');
+(23, 0.12, 'distributed', '2026-05-05 19:00:00'),
+(24, 100000.00, 'distributed', '2026-05-05 19:00:00'),
+(25, 2000.00, 'company_only', '2026-05-06 19:00:00'),
+(26, 2000.00, 'company_only', '2026-05-06 19:00:00');
 
 -- --------------------------------------------------------
 
@@ -97,7 +121,9 @@ CREATE TABLE `ledger` (
 
 INSERT INTO `ledger` (`id`, `partner_id`, `credit`, `debit`, `balance`, `created_at`) VALUES
 (40, 22, 0.03, 0.00, 0.03, '2026-05-05 19:00:00'),
-(41, 21, 0.03, 0.00, 0.03, '2026-05-05 19:00:00');
+(41, 21, 0.03, 0.00, 0.03, '2026-05-05 19:00:00'),
+(42, 22, 25000.00, 0.00, 25000.03, '2026-05-05 19:00:00'),
+(43, 21, 25000.00, 0.00, 25000.03, '2026-05-05 19:00:00');
 
 -- --------------------------------------------------------
 
@@ -140,7 +166,9 @@ CREATE TABLE `partner_shares` (
 
 INSERT INTO `partner_shares` (`id`, `partner_id`, `income_id`, `amount`, `created_at`) VALUES
 (35, 22, 23, 0.03, '2026-05-06 13:23:18'),
-(36, 21, 23, 0.03, '2026-05-06 13:23:18');
+(36, 21, 23, 0.03, '2026-05-06 13:23:18'),
+(37, 22, 24, 25000.00, '2026-05-06 15:45:33'),
+(38, 21, 24, 25000.00, '2026-05-06 15:45:33');
 
 -- --------------------------------------------------------
 
@@ -225,19 +253,19 @@ ALTER TABLE `admin_users`
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- AUTO_INCREMENT for table `income`
 --
 ALTER TABLE `income`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `ledger`
 --
 ALTER TABLE `ledger`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT for table `partners`
@@ -249,7 +277,7 @@ ALTER TABLE `partners`
 -- AUTO_INCREMENT for table `partner_shares`
 --
 ALTER TABLE `partner_shares`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT for table `partner_users`
